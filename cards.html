@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Scegli una Carta</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <button id="back-btn">← Indietro</button>
+    <div class="header-center">
+      <span id="mode-title"></span>
+      <span id="page-info"></span>
+    </div>
+    <div class="toggle-container">
+      <button id="theme-toggle">🌙</button>
+    </div>
+    <button id="exit-btn">Esci</button>
+  </header>
+
+  <div id="grid" class="grid-container fade-in"></div>
+  
+  <script src="theme.js" defer></script>
+  <script>
+    document.getElementById('back-btn').addEventListener('click', () => history.back());
+    document.getElementById('exit-btn').addEventListener('click', () => location.href = 'index.html');
+
+    const params = new URLSearchParams(location.search);
+    const mode = params.get('mode') || 'covered';
+    document.getElementById('mode-title').textContent =
+      mode === 'covered' ? 'Modalità a carte coperte' : 'Modalità a carte scoperte';
+
+    let catalog = [];
+    let firstLoad = true;
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function renderAllCards() {
+      const grid = document.getElementById('grid');
+      grid.innerHTML = '';
+
+      catalog.forEach(({i, ext}) => {
+        const cell = document.createElement('div');
+        cell.className = 'grid-item';
+        const img = document.createElement('img');
+        img.loading = 'lazy';
+        if (mode === 'covered') {
+          img.src = 'cards/retro.jpg';
+          img.alt = 'Retro';
+        } else {
+          img.src = `cards/carta${i}${ext}`;
+          img.alt = `Carta ${i}`;
+        }
+        img.addEventListener('click', () => {
+          location.href = `card.html?card=${i}&ext=${ext}`;
+        });
+        cell.appendChild(img);
+        grid.appendChild(cell);
+      });
+    }
+
+    // Chiavi per sessionStorage
+    const preloadKey = 'catalog_preload';
+    const orderedKey = `catalog_ordered_${mode}`;
+
+    // Caricamento iniziale
+    const savedOrder = sessionStorage.getItem(orderedKey);
+    const parsed = JSON.parse(sessionStorage.getItem(preloadKey) || '[]');
+
+    if (savedOrder) {
+      // Se esiste un ordine salvato, usalo
+      catalog = JSON.parse(savedOrder);
+      renderAllCards();
+      firstLoad = false;
+    } else if (parsed.length > 0) {
+      // Mischia solo la prima volta e salva l'ordine
+      catalog = shuffle(parsed);
+      sessionStorage.setItem(orderedKey, JSON.stringify(catalog));
+      renderAllCards();
+      firstLoad = false;
+    } else {
+      document.getElementById('grid').textContent = 'Caricamento carte...';
+    }
+
+    // Aggiornamento incrementale senza rimescolare
+    const poll = setInterval(() => {
+      const updated = JSON.parse(sessionStorage.getItem(preloadKey) || '[]');
+      if (updated.length > catalog.length) {
+        if (firstLoad) {
+          catalog = shuffle(updated);
+          firstLoad = false;
+        } else {
+          const existingKeys = new Set(catalog.map(c => `${c.i}${c.ext}`));
+          const newOnes = updated.filter(c => !existingKeys.has(`${c.i}${c.ext}`));
+          catalog = [...catalog, ...newOnes];
+        }
+        // Aggiorna l'ordine salvato
+        sessionStorage.setItem(orderedKey, JSON.stringify(catalog));
+        renderAllCards();
+      }
+    }, 1000);
+  </script>
+</body>
+</html>
