@@ -1,0 +1,321 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+:root {
+  --base-font-size: 17px;
+  --font-scale: 1.333;
+  --bg-color: #ffffff;
+  --text-color: #222222;
+  --header-bg: #f5f5f5;
+  --primary: #4CAF50;
+  --primary-dark: #2E7D32;
+  --button-radius: 8px;
+}
+
+body.dark {
+  --bg-color: #222222;
+  --text-color: #e0e0e0;
+  --header-bg: #333333;
+  --primary: #66BB6A;
+  --primary-dark: #388E3C;
+}
+
+html {
+  font-size: var(--base-font-size);
+}
+
+@media (max-width: 600px) {
+  html {
+    font-size: 15px;
+    --font-scale: 1.125;
+  }
+}
+
+@media (min-width: 1200px) {
+  html {
+    font-size: 18px;
+  }
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Poppins', Arial, sans-serif;
+  font-size: 1.333rem;
+  line-height: 1.7;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+/* HEADER */
+header {
+  height: 40px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 6px;
+  background: var(--header-bg);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
+}
+header:hover { opacity: 1; }
+
+header button {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  margin: 0 3px;
+  padding: 2px 6px;
+}
+
+.toggle-container button {
+  background: none;
+  border: none;
+  font-size: 1.333rem;
+  cursor: pointer;
+}
+
+/* CENTRATURA CONTENUTI */
+.centered {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: calc(100% - 40px);
+  text-align: center;
+  margin: 10px 0;
+}
+
+/* TIPOGRAFIA */
+h1 {
+  font-size: calc(1rem * var(--font-scale) * var(--font-scale) * var(--font-scale));
+  font-weight: 600;
+  margin-bottom: 0.5em;
+  letter-spacing: 0.5px;
+}
+
+h2 {
+  font-size: calc(1rem * var(--font-scale) * var(--font-scale));
+  font-weight: 600;
+  margin-bottom: 0.5em;
+}
+
+h3 {
+  font-size: calc(1rem * var(--font-scale));
+  font-weight: 600;
+  margin-bottom: 0.5em;
+}
+
+p {
+  font-size: 1.333rem;
+  margin-bottom: 1em;
+}
+
+/* BOTTONI */
+.button-group button,
+.nav-button,
+#pagination button {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  border: none;
+  border-radius: var(--button-radius);
+  padding: 0.6em 1.2em;
+  margin: 0.4em;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.button-group button:hover,
+.nav-button:hover,
+#pagination button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* GRIGLIA CARTE */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  padding: 10px;
+  height: calc(100vh - 40px - 50px);
+  padding-bottom: 60px;
+  overflow-y: auto;
+}
+
+@media (max-width: 600px)   { .grid-container { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 601px) and (max-width: 900px) { .grid-container { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 901px)  { .grid-container { grid-template-columns: repeat(6, 1fr); } }
+
+.grid-item { perspective: 1000px; }
+
+/* FLIP CARTE */
+.flip-inner {
+  position: relative;
+  width: 100%;
+  transform: rotateY(0deg);
+  transition: transform 0.6s cubic-bezier(.4,.2,.2,1);
+  transform-style: preserve-3d;
+}
+
+.flip-inner.flipped { transform: rotateY(180deg); }
+
+.flip-inner img {
+  width: 100%;
+  display: block;
+  backface-visibility: hidden;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  transition: box-shadow 0.3s ease;
+}
+
+.grid-item:hover .flip-inner img {
+  box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+}
+
+.flip-back { transform: rotateY(0deg); }
+.flip-front { transform: rotateY(180deg); }
+
+/* FULLSCREEN CARD */
+.fullscreen-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  border-radius: 8px;
+}
+
+/* PAGINAZIONE */
+#pagination {
+  position: sticky;
+  top: 40px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  pointer-events: none;
+  z-index: 5;
+}
+
+#pagination button {
+  pointer-events: auto;
+}
+
+#pagination #mode-title {
+  pointer-events: none;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+/* TEMA SCURO SPECIFICO */
+body.dark .button-group button,
+body.dark .nav-button,
+body.dark #pagination button {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+}
+
+body.dark .grid-item img {
+  box-shadow: 0 2px 6px rgba(255,255,255,0.1);
+}
+
+body.dark .grid-item:hover .flip-inner img {
+  box-shadow: 0 6px 14px rgba(255,255,255,0.2);
+}
+
+/* LOADER */
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 9999;
+  font-family: sans-serif;
+  font-size: 1.333rem;
+  color: #333;
+}
+
+.loader {
+  border: 6px solid #ccc;
+  border-top: 6px solid #0078D7;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Indicatore pagina in header */
+header #page-info {
+  margin-left: auto;
+  font-size: 1.25rem;
+  font-weight: 600;
+  padding: 0 8px;
+  color: var(--text-color);
+  opacity: 0.9;
+}
+
+body.dark header #page-info {
+  color: var(--text-color);
+}
+
+/* Contenitore centrale nell'header */
+.header-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Titolo modalità */
+.header-center #mode-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+/* Numero pagina */
+.header-center #page-info {
+  font-size: 1.25rem;
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+/* --- Stile specifico per la pagina della singola carta --- */
+body.single-card {
+  display: flex;
+  flex-direction: column; /* mantiene l'header in alto */
+  height: 100vh;
+  margin: 0;
+}
+
+body.single-card main.centered {
+  flex: 1; /* occupa tutto lo spazio sotto l'header */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+body.single-card .fullscreen-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}

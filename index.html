@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Scelta della modalità di lavoro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Preload immagini iniziali -->
+  <link rel="preload" href="cards/retro.jpg" as="image">
+  <link rel="preload" href="cards/carta1.jpg" as="image">
+  <link rel="preload" href="cards/carta2.jpg" as="image">
+  <link rel="preload" href="cards/carta3.jpg" as="image">
+  <link rel="preload" href="cards/carta4.jpg" as="image">
+  <link rel="preload" href="cards/carta5.jpg" as="image">
+  <link rel="preload" href="cards/carta6.jpg" as="image">
+  <link rel="preload" href="cards/carta7.jpg" as="image">
+  <link rel="preload" href="cards/carta8.jpg" as="image">
+  <link rel="preload" href="cards/carta9.jpg" as="image">
+  <link rel="preload" href="cards/carta10.jpg" as="image">
+  <link rel="preload" href="cards/carta11.jpg" as="image">
+  <link rel="preload" href="cards/carta12.jpg" as="image">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="toggle-container">
+      <button id="theme-toggle">🌙</button>
+    </div>
+  </header>
+
+  <main class="centered">
+    <h1>Scegli la modalità di lavoro:</h1>
+    <div class="button-group">
+      <button id="covered">Carte coperte</button>
+      <button id="exposed">Carte scoperte</button>
+    </div>
+  </main>
+
+  <div id="loader" class="loader-container" style="display:none;">
+    <div class="loader"></div>
+    <p id="loader-text">Caricamento carte in corso...</p>
+  </div>
+
+  <script src="theme.js" defer></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const loader = document.getElementById('loader');
+      const loaderText = document.getElementById('loader-text');
+      const coveredBtn = document.getElementById('covered');
+      const exposedBtn = document.getElementById('exposed');
+
+      function tryImage(url) {
+        return new Promise(resolve => {
+          const img = new Image();
+          img.onload = () => resolve(true);
+          img.onerror = () => resolve(false);
+          img.src = url;
+        });
+      }
+
+      async function detectCatalogWithPool({maxIndex=500, poolSize=8, exts=['.jpg','.png']}={}) {
+        const found = [];
+        let current = 1;
+        let updateCount = 0;
+
+        async function worker() {
+          while (true) {
+            const i = current++;
+            if (i > maxIndex) return;
+            for (const ext of exts) {
+              const url = `cards/carta${i}${ext}`;
+              if (await tryImage(url)) {
+                found.push({i, ext});
+                updateCount++;
+                if (updateCount % 5 === 0) {
+                  sessionStorage.setItem('catalog_preload', JSON.stringify(found));
+                }
+                break;
+              }
+            }
+          }
+        }
+
+        await Promise.all(Array.from({length: poolSize}, worker));
+        found.sort((a,b)=>a.i-b.i);
+        sessionStorage.setItem('catalog_preload', JSON.stringify(found));
+        return found;
+      }
+
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => detectCatalogWithPool());
+      } else {
+        setTimeout(() => detectCatalogWithPool(), 200);
+      }
+
+      function goToMode(mode) {
+        const MIN_READY = 12;
+        const parsed = JSON.parse(sessionStorage.getItem('catalog_preload') || '[]');
+        if (parsed.length >= MIN_READY) {
+          location.href = `cards.html?mode=${mode}`;
+        } else {
+          loader.style.display = 'flex';
+          loaderText.textContent = "Attendi caricamento carte iniziali...";
+          const check = setInterval(() => {
+            const updated = JSON.parse(sessionStorage.getItem('catalog_preload') || '[]');
+            if (updated.length >= MIN_READY) {
+              clearInterval(check);
+              loader.style.display = 'none';
+              location.href = `cards.html?mode=${mode}`;
+            }
+          }, 200);
+        }
+      }
+
+      coveredBtn.addEventListener('click', () => goToMode('covered'));
+      exposedBtn.addEventListener('click', () => goToMode('exposed'));
+    });
+  </script>
+</body>
+</html>
