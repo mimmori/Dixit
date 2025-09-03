@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Scegli una Carta</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <button id="back-btn">← Indietro</button>
+    <button id="exit-btn">Esci</button>
+    <div class="toggle-container">
+      <button id="theme-toggle">🌙</button>
+    </div>
+  </header>
+
+  <h2 id="mode-title" class="centered"></h2>
+  <div id="page-indicator" class="centered"></div>
+  <div id="grid" class="grid-container fade-in"></div>
+  <div id="pagination" class="centered pagination-bottom"></div>
+
+  <script src="theme.js" defer></script>
+  <script>
+    document.getElementById('back-btn').addEventListener('click', () => history.back());
+    document.getElementById('exit-btn').addEventListener('click', () => location.href = 'index.html');
+
+    const params = new URLSearchParams(location.search);
+    const mode = params.get('mode') || 'covered';
+    document.getElementById('mode-title').textContent =
+      mode === 'covered' ? 'Modalità a carte coperte' : 'Modalità a carte scoperte';
+
+    const CARDS_PER_PAGE = 50;
+    let catalog = [], currentPage = 0;
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function renderPage(page) {
+      const grid = document.getElementById('grid');
+      grid.classList.remove('fade-in');
+      grid.innerHTML = '';
+
+      const start = page * CARDS_PER_PAGE;
+      const end = start + CARDS_PER_PAGE;
+      const slice = catalog.slice(start, end);
+
+      if (slice.length === 0) {
+        grid.textContent = 'Nessuna carta disponibile.';
+        return;
+      }
+
+      slice.forEach(({i, ext}) => {
+        const cell = document.createElement('div');
+        cell.className = 'grid-item';
+
+        if (mode === 'covered') {
+          const inner = document.createElement('div');
+          inner.className = 'flip-inner';
+
+          const back = document.createElement('img');
+          back.src = 'cards/retro.jpg';
+          back.alt = 'Retro';
+          back.className = 'flip-back';
+          back.loading = 'lazy';
+
+          const front = document.createElement('img');
+          front.src = `cards/carta${i}${ext}`;
+          front.alt = `Carta ${i}`;
+          front.className = 'flip-front';
+          front.loading = 'lazy';
+
+          inner.appendChild(back);
+          inner.appendChild(front);
+          cell.appendChild(inner);
+
+          cell.addEventListener('click', () => {
+            inner.classList.add('flipped');
+            inner.addEventListener('transitionend', () => {
+              location.href = `card.html?card=${i}&ext=${ext}`;
+            }, { once: true });
+          });
+        } else {
+          const img = document.createElement('img');
+          img.src = `cards/carta${i}${ext}`;
+          img.alt = `Carta ${i}`;
+          img.loading = 'lazy';
+          img.addEventListener('click', () => {
+            location.href = `card.html?card=${i}&ext=${ext}`;
+          });
+          cell.appendChild(img);
+        }
+
+        grid.appendChild(cell);
+      });
+
+      updatePaginationControls();
+      document.title = `Scegli una Carta - Pag ${page + 1} di ${Math.ceil(catalog.length / CARDS_PER_PAGE)}`;
+
+      requestAnimationFrame(() => grid.classList.add('fade-in'));
+    }
+
+    function updatePaginationControls() {
+      const controls = document.getElementById('pagination');
+      controls.innerHTML = '';
+
+      const totalPages = Math.ceil(catalog.length / CARDS_PER_PAGE);
+
+      if (currentPage > 0) {
+        const prev = document.createElement('button');
+        prev.textContent = '⬅';
+        prev.className = 'nav-button';
+        prev.onclick = () => { currentPage--; renderPage(currentPage); };
+        controls.appendChild(prev);
+      }
+
+      if (currentPage < totalPages - 1) {
+        const next = document.createElement('button');
+        next.textContent = '➡';
+        next.className = 'nav-button';
+        next.onclick = () => { currentPage++; renderPage(currentPage); };
+        controls.appendChild(next);
+      }
+
+      document.getElementById('page-indicator').textContent = `Pagina ${currentPage + 1} di ${totalPages}`;
+    }
+
+    // Caricamento catalogo precaricato
+    const preloadKey = 'catalog_preload';
+    const stored = sessionStorage.getItem(preloadKey);
+
+    const savedCatalog = sessionStorage.getItem(`catalog_${mode}`);
+
+    if (savedCatalog) {
+      try {
+        catalog = JSON.parse(savedCatalog);
+        console.log(`Catalogo già salvato: ${catalog.length} carte`);
+        renderPage(currentPage);
+      } catch (e) {
+        console.error('Errore nel parsing del catalogo salvato:', e);
+        document.getElementById('grid').textContent = 'Errore nel caricamento delle carte.';
+      }
+    } else if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          catalog = shuffle(parsed);
+          sessionStorage.setItem(`catalog_${mode}`, JSON.stringify(catalog));
+          console.log(`Catalogo mescolato e salvato: ${catalog.length} carte`);
+          renderPage(currentPage);
+        } else {
+          throw new Error('Catalogo vuoto o non valido');
+        }
+      } catch (e) {
+        console.error('Errore nel parsing del catalogo:', e);
+        document.getElementById('grid').textContent = 'Errore nel caricamento delle carte.';
+      }
+    } else {
+      console.warn('Catalogo non trovato in sessionStorage.');
+      document.getElementById('grid').textContent = 'Nessun catalogo disponibile. Torna alla home.';
+    }
+  </script>
+</body>
+</html>

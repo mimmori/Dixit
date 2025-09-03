@@ -1,0 +1,28 @@
+Ciao, puoi realizzarmi una pagina web che permetta di giocare ad un gioco?
+
+Ti spiego il gioco:
+
+Lo scopo è quello di scegliere una carta tra tante altre e visualizzarla poi a schermo intero.
+Ci sono due modalitá:
+1. "a carte coperte" dove tutte le carte non sono mostrate, si vedrà quindi a schermo una griglia il retro di tutte le carte selezionabili (eventualmente su più schermate scorrevoli se le carte sono tante)
+
+2. "a carte scoperte" dove tutte le carte sono visibili, si vedrà quindi a schermo una griglia con tutte le carte selezionabili (eventualmente su più schermate scorrevoli se le carte sono tante)
+
+Come realizzarlo:
+
+- Al caricamento della pagina viene mostrata una schermata di scelta della modalitá di gioco "a carte coperte" o "a carte scoperte";
+
+- Quando l'utente sceglie la modalitá, si passa ad una nuova pagina dove vengono mostrate le carte nella modalitá selezionata. In questa schermata deve essere prevista la possibilità di tornare indietro o uscire dal gioco
+
+- Quando l'utente sceglie la carta, si passa ad una nuova pagina dove viene mostrata, a schermo intero, il fronte della carta scelta. Anche in questa schermata deve essere prevista la possibilità di tornare indietro o uscire dal gioco
+
+Requisiti tecnici:
+
+- Il sito deve girare soltanto lato utente e non deve richiedere installazioni particolari lato server.
+
+- Tutte le immagini del fronte delle carte e quella del retro si trovano all'interno di una sottodirectory accanto ai file delle pagine web.
+
+- Le immagini saranno nominate con la regola: carta1, carta2, carta3, ... eccetera. L'immagine del retro si chiamerà retro
+
+- La pagina capisce in automatico il numero di carte presenti e in base a questo dimensionerà la griglia e il numero di videate
+
