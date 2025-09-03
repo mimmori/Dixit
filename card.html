@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Carta Selezionata</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="single-card">
+  <header>
+    <button id="back-btn">← Indietro</button>
+    <button id="exit-btn">Esci</button>
+    <div class="toggle-container">
+      <button id="theme-toggle">🌙</button>
+    </div>
+  </header>
+
+  <main class="centered">
+    <img id="fullcard" class="fullscreen-img" alt="Carta">
+  </main>
+
+  <script src="theme.js" defer></script>
+  <script>
+    // Navigazione
+    document.getElementById('back-btn').addEventListener('click', () => history.back());
+    document.getElementById('exit-btn').addEventListener('click', () => location.href = 'index.html');
+
+    // Parametri URL
+    const params = new URLSearchParams(location.search);
+    const idx = parseInt(params.get('card'), 10);
+    let ext = params.get('ext');
+
+    const img = document.getElementById('fullcard');
+
+    if (Number.isInteger(idx) && idx > 0) {
+      if (ext) {
+        // Se l'estensione è passata, usala direttamente
+        img.src = `cards/carta${idx}${ext}`;
+        img.alt = `Carta ${idx}`;
+      } else {
+        // Se non c'è estensione, prova prima .jpg poi .png
+        img.src = `cards/carta${idx}.jpg`;
+        img.alt = `Carta ${idx}`;
+        img.onerror = () => {
+          img.onerror = null; // evita loop infinito
+          img.src = `cards/carta${idx}.png`;
+        };
+      }
+    } else {
+      img.alt = "Carta non specificata";
+    }
+  </script>
+</body>
+</html>

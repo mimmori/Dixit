@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Scegli una Carta</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <button id="back-btn">← Indietro</button>
+    <div class="header-center">
+      <span id="mode-title"></span>
+      <span id="page-info"></span>
+    </div>
+    <div class="toggle-container">
+      <button id="theme-toggle">🌙</button>
+    </div>
+    <button id="exit-btn">Esci</button>
+  </header>
+
+  <div id="grid" class="grid-container fade-in"></div>
+
+  <script src="theme.js" defer></script>
+  <script>
+    document.getElementById('back-btn').addEventListener('click', () => history.back());
+    document.getElementById('exit-btn').addEventListener('click', () => location.href = 'index.html');
+
+    const params = new URLSearchParams(location.search);
+    const validModes = ['covered', 'exposed'];
+    const mode = validModes.includes(params.get('mode')) ? params.get('mode') : 'covered';
+
+    document.getElementById('mode-title').textContent =
+      mode === 'covered' ? 'Modalità a carte coperte' : 'Modalità a carte scoperte';
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function renderAllCards(catalog) {
+      const grid = document.getElementById('grid');
+      grid.innerHTML = '';
+
+      catalog.forEach(({ i, ext }) => {
+        const cell = document.createElement('div');
+        cell.className = 'grid-item';
+        const img = document.createElement('img');
+        img.loading = 'lazy';
+        if (mode === 'covered') {
+          img.src = 'cards/retro.jpg';
+          img.alt = 'Retro';
+        } else {
+          img.src = `cards/carta${i}${ext}`;
+          img.alt = `Carta ${i}`;
+        }
+        img.addEventListener('click', () => {
+          location.href = `card.html?card=${i}&ext=${ext}`;
+        });
+        cell.appendChild(img);
+        grid.appendChild(cell);
+      });
+    }
+
+    const preloadKey = 'catalog_preload';
+    const orderedKey = `catalog_ordered_${mode}`;
+    const savedOrder = sessionStorage.getItem(orderedKey);
+    const parsed = JSON.parse(sessionStorage.getItem(preloadKey) || '[]');
+
+    let catalog = [];
+
+    if (savedOrder) {
+      catalog = JSON.parse(savedOrder);
+    } else if (parsed.length > 0) {
+      catalog = shuffle(parsed);
+      sessionStorage.setItem(orderedKey, JSON.stringify(catalog));
+    }
+
+    if (catalog.length > 0) {
+      renderAllCards(catalog);
+    } else {
+      document.getElementById('grid').textContent = 'Caricamento carte...';
+    }
+  </script>
+</body>
+</html>

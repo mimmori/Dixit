@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Scelta della modalità di lavoro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preload" href="cards/retro.jpg" as="image">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="toggle-container">
+      <button id="theme-toggle">🌙</button>
+    </div>
+  </header>
+
+  <main class="centered">
+    <h1>Scegli la modalità di lavoro:</h1>
+    <div class="button-group">
+      <button id="covered">Carte coperte</button>
+      <button id="exposed">Carte scoperte</button>
+    </div>
+  </main>
+
+  <div id="loader" class="loader-container" style="display:none;">
+    <div class="loader"></div>
+    <p id="loader-text">Caricamento carte in corso...</p>
+  </div>
+
+  <script src="theme.js" defer></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const loader = document.getElementById('loader');
+      const loaderText = document.getElementById('loader-text');
+      const coveredBtn = document.getElementById('covered');
+      const exposedBtn = document.getElementById('exposed');
+
+      async function loadCatalogFromDeckFile() {
+        try {
+          const response = await fetch('deck.txt');
+          const text = await response.text();
+          const count = parseInt(text.trim(), 10);
+          if (!Number.isInteger(count) || count <= 0) return [];
+
+          const found = [];
+          for (let i = 1; i <= count; i++) {
+            found.push({ i, ext: '.jpg' });
+          }
+          sessionStorage.setItem('catalog_preload', JSON.stringify(found));
+          return found;
+        } catch (e) {
+          console.error('Errore nel caricamento del mazzo:', e);
+          return [];
+        }
+      }
+
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => loadCatalogFromDeckFile());
+      } else {
+        setTimeout(() => loadCatalogFromDeckFile(), 200);
+      }
+
+      function goToMode(mode) {
+        const MIN_READY = 12;
+        const parsed = JSON.parse(sessionStorage.getItem('catalog_preload') || '[]');
+        if (parsed.length >= MIN_READY) {
+          location.href = `cards.html?mode=${mode}`;
+        } else {
+          loader.style.display = 'flex';
+          loaderText.textContent = "Attendi caricamento carte iniziali...";
+          const check = setInterval(() => {
+            const updated = JSON.parse(sessionStorage.getItem('catalog_preload') || '[]');
+            if (updated.length >= MIN_READY) {
+              clearInterval(check);
+              loader.style.display = 'none';
+              location.href = `cards.html?mode=${mode}`;
+            }
+          }, 200);
+        }
+      }
+
+      coveredBtn.addEventListener('click', () => goToMode('covered'));
+      exposedBtn.addEventListener('click', () => goToMode('exposed'));
+    });
+  </script>
+</body>
+</html>
