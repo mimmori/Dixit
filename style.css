@@ -30,32 +30,36 @@ html, body {
   color: var(--text-color);
 }
 
-/* HEADER */
+/* HEADER più sottile */
 header {
-  height: 50px;
+  height: 40px;
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  padding: 0 10px;
+  padding: 0 6px;
   background: var(--header-bg);
   position: sticky;
   top: 0;
   z-index: 10;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
 }
+header:hover { opacity: 1; }
 
 header button {
   background: none;
   border: none;
-  font-size: 1rem;
+  font-size: 0.9rem;
   cursor: pointer;
-  margin: 0 5px;
+  margin: 0 3px;
+  padding: 2px 6px;
 }
 
 .toggle-container button {
   background: none;
   border: none;
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   cursor: pointer;
 }
 
@@ -65,13 +69,9 @@ header button {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: calc(100% - 50px);
+  height: calc(100% - 40px);
   text-align: center;
   margin: 10px 0;
-}
-
-.pagination-bottom {
-  margin-top: 30px;
 }
 
 /* BOTTONI */
@@ -82,9 +82,9 @@ header button {
   color: white;
   border: none;
   border-radius: var(--button-radius);
-  padding: 0.8em 1.5em;
-  margin: 0.5em;
-  font-size: 1rem;
+  padding: 0.6em 1.2em;
+  margin: 0.4em;
+  font-size: 0.9rem;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
 }
@@ -102,7 +102,8 @@ header button {
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 10px;
   padding: 10px;
-  height: calc(100vh - 50px);
+  height: calc(100vh - 40px - 50px);
+  padding-bottom: 60px;
   overflow-y: auto;
 }
 
@@ -110,45 +111,34 @@ header button {
 @media (min-width: 601px) and (max-width: 900px) { .grid-container { grid-template-columns: repeat(4, 1fr); } }
 @media (min-width: 901px)  { .grid-container { grid-template-columns: repeat(6, 1fr); } }
 
-.grid-item {
-  perspective: 1000px;
-}
+.grid-item { perspective: 1000px; }
 
 /* FLIP CARTE */
 .flip-inner {
   position: relative;
   width: 100%;
-  transform: rotateY(0deg); /* stato iniziale coperto */
+  transform: rotateY(0deg);
   transition: transform 0.6s cubic-bezier(.4,.2,.2,1);
   transform-style: preserve-3d;
 }
 
-.flip-inner.flipped {
-  transform: rotateY(180deg);
-}
+.flip-inner.flipped { transform: rotateY(180deg); }
 
 .flip-inner img {
   width: 100%;
   display: block;
   backface-visibility: hidden;
   border-radius: 6px;
-  /* Ombra base per effetto fisico */
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
   transition: box-shadow 0.3s ease;
 }
 
-/* Ombra più marcata in hover */
 .grid-item:hover .flip-inner img {
   box-shadow: 0 6px 14px rgba(0,0,0,0.25);
 }
 
-.flip-back {
-  transform: rotateY(0deg);
-}
-
-.flip-front {
-  transform: rotateY(180deg);
-}
+.flip-back { transform: rotateY(0deg); }
+.flip-front { transform: rotateY(180deg); }
 
 /* FULLSCREEN CARD */
 .fullscreen-img {
@@ -159,9 +149,26 @@ header button {
   border-radius: 8px;
 }
 
-/* PAGINAZIONE */
+/* PAGINAZIONE: pulsanti ai lati */
+#pagination {
+  position: fixed;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10px;
+  background: none;
+  box-shadow: none;
+  pointer-events: none; /* evita click su area vuota */
+}
+
 #pagination button {
-  font-size: 1rem;
+  pointer-events: auto; /* riattiva click sui pulsanti */
+  background: rgba(255,255,255,0.85);
+  font-size: 1.2rem;
+  padding: 0.4em 0.8em;
+  border-radius: 6px;
 }
 
 /* TEMA SCURO SPECIFICO */
@@ -178,6 +185,8 @@ body.dark .grid-item img {
 body.dark .grid-item:hover .flip-inner img {
   box-shadow: 0 6px 14px rgba(255,255,255,0.2);
 }
+
+/* LOADER */
 .loader-container {
   display: flex;
   flex-direction: column;
