@@ -83,6 +83,10 @@
       }
 
       async function startWithMode(mode) {
+        location.href = `cards.html?mode=${mode}`;
+      }
+
+      async function loadcatalog() {
         loader.style.display = 'flex';
         sessionStorage.clear();
         const catalog = await detectCatalog();
@@ -94,9 +98,9 @@
         sessionStorage.setItem('catalog_preload', JSON.stringify(catalog));
         console.log(`Catalogo precaricato: ${catalog.length} carte trovate`);
         loader.style.display = 'none';
-        location.href = `cards.html?mode=${mode}`;
       }
 
+	  loadcatalog();
       coveredBtn.addEventListener('click', () => startWithMode('covered'));
       exposedBtn.addEventListener('click', () => startWithMode('exposed'));
     });
