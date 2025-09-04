@@ -149,26 +149,29 @@ header button {
   border-radius: 8px;
 }
 
-/* PAGINAZIONE: pulsanti ai lati */
 #pagination {
-  position: fixed;
-  bottom: 10px;
+  position: sticky;   /* o fixed se vuoi che resti sempre visibile */
+  top: 40px;          /* altezza dell’header */
   left: 0;
   right: 0;
   display: flex;
   justify-content: space-between;
-  padding: 0 10px;
-  background: none;
-  box-shadow: none;
-  pointer-events: none; /* evita click su area vuota */
+  align-items: center;
+  padding: 4px 10px;
+  /*background: rgba(255,255,255,0.85);*/
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  pointer-events: none;
+  z-index: 5;
 }
 
 #pagination button {
-  pointer-events: auto; /* riattiva click sui pulsanti */
-  background: rgba(255,255,255,0.85);
-  font-size: 1.2rem;
-  padding: 0.4em 0.8em;
-  border-radius: 6px;
+  pointer-events: auto;
+}
+
+#pagination #mode-title {
+  pointer-events: none;
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
 /* TEMA SCURO SPECIFICO */

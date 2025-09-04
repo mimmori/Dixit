@@ -14,11 +14,14 @@
     </div>
   </header>
 
-  <h2 id="mode-title" class="centered"></h2>
   <div id="page-indicator" class="centered"></div>
   <div id="grid" class="grid-container fade-in"></div>
-  <div id="pagination" class="centered pagination-bottom"></div>
-
+  <div id="pagination">
+    <button id="prev-btn" class="nav-button">⬅</button>
+    <span id="mode-title"></span>
+    <button id="next-btn" class="nav-button">➡</button>
+  </div>
+  
   <script src="theme.js" defer></script>
   <script>
     document.getElementById('back-btn').addEventListener('click', () => history.back());
@@ -104,30 +107,31 @@
       requestAnimationFrame(() => grid.classList.add('fade-in'));
     }
 
-    function updatePaginationControls() {
-      const controls = document.getElementById('pagination');
-      controls.innerHTML = '';
+	function updatePaginationControls() {
+	  const totalPages = Math.ceil(catalog.length / CARDS_PER_PAGE);
 
-      const totalPages = Math.ceil(catalog.length / CARDS_PER_PAGE);
+	  // Mostra/nasconde il pulsante indietro
+	  document.getElementById('prev-btn').style.visibility =
+		currentPage > 0 ? 'visible' : 'hidden';
 
-      if (currentPage > 0) {
-        const prev = document.createElement('button');
-        prev.textContent = '⬅';
-        prev.className = 'nav-button';
-        prev.onclick = () => { currentPage--; renderPage(currentPage); };
-        controls.appendChild(prev);
-      }
+	  // Mostra/nasconde il pulsante avanti
+	  document.getElementById('next-btn').style.visibility =
+		currentPage < totalPages - 1 ? 'visible' : 'hidden';
 
-      if (currentPage < totalPages - 1) {
-        const next = document.createElement('button');
-        next.textContent = '➡';
-        next.className = 'nav-button';
-        next.onclick = () => { currentPage++; renderPage(currentPage); };
-        controls.appendChild(next);
-      }
+	  // Aggiorna indicatore pagina (se vuoi tenerlo)
+	  document.getElementById('page-indicator').textContent =
+		`Pagina ${currentPage + 1} di ${totalPages}`;
+	}
+	
+	document.getElementById('prev-btn').addEventListener('click', () => {
+	  currentPage--;
+	  renderPage(currentPage);
+	});
 
-      document.getElementById('page-indicator').textContent = `Pagina ${currentPage + 1} di ${totalPages}`;
-    }
+	document.getElementById('next-btn').addEventListener('click', () => {
+	  currentPage++;
+	  renderPage(currentPage);
+	});
 
     // Caricamento catalogo precaricato
     const preloadKey = 'catalog_preload';
