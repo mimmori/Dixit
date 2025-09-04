@@ -41,7 +41,7 @@
           const img = new Image();
           img.onload = () => resolve(true);
           img.onerror = () => resolve(false);
-          img.src = src + '?v=' + Date.now(); // evita cache
+          img.src = src;
         });
       }
 
@@ -80,7 +80,32 @@
 
         return found;
       }
-
+	  
+      async function detectCatalogParallel(maxIndex = 500, timeout = 100000) {
+        const startTime = Date.now();
+      
+        const tasks = Array.from({ length: maxIndex }, (_, idx) => {
+          const i = idx + 1;
+          return (async () => {
+            if (Date.now() - startTime > timeout) return null;
+      
+            const jpg = await imageExists(`cards/carta${i}.jpg`);
+            if (jpg) return { i, ext: '.jpg' };
+      
+            const png = await imageExists(`cards/carta${i}.png`);
+            if (png) return { i, ext: '.png' };
+      
+            return null;
+          })();
+        });
+      
+        const results = await Promise.allSettled(tasks);
+        return results
+          .map(r => r.status === 'fulfilled' ? r.value : null)
+          .filter(Boolean);
+      }
+	  
+	  
       async function startWithMode(mode) {
         location.href = `cards.html?mode=${mode}`;
       }
@@ -88,7 +113,7 @@
       async function loadcatalog() {
         loader.style.display = 'flex';
         sessionStorage.clear();
-        const catalog = await detectCatalog();
+        const catalog = await detectCatalogParallel();
         if (catalog.length === 0) {
           loader.style.display = 'none';
           alert('Nessuna carta trovata. Verifica la cartella "cards/"');
