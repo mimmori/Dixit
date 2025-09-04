@@ -45,7 +45,7 @@
         });
       }
 
-      async function detectCatalog(maxIndex = 500, missLimit = 10, timeout = 10000) {
+      async function detectCatalog(maxIndex = 500, missLimit = 10, timeout = 100000) {
         const found = [];
         let misses = 0;
         let i = 1;
