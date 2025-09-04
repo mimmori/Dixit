@@ -12,9 +12,10 @@
     <div class="toggle-container">
       <button id="theme-toggle">🌙</button>
     </div>
+    <span id="page-info"></span> <!-- nuovo indicatore pagina -->
   </header>
 
-  <div id="page-indicator" class="centered"></div>
+  <!-- RIMOSSO: <div id="page-indicator" class="centered"></div> -->
   <div id="grid" class="grid-container fade-in"></div>
   <div id="pagination">
     <button id="prev-btn" class="nav-button">⬅</button>
@@ -107,45 +108,39 @@
       requestAnimationFrame(() => grid.classList.add('fade-in'));
     }
 
-	function updatePaginationControls() {
-	  const totalPages = Math.ceil(catalog.length / CARDS_PER_PAGE);
+    function updatePaginationControls() {
+      const totalPages = Math.ceil(catalog.length / CARDS_PER_PAGE);
 
-	  // Mostra/nasconde il pulsante indietro
-	  document.getElementById('prev-btn').style.visibility =
-		currentPage > 0 ? 'visible' : 'hidden';
+      document.getElementById('prev-btn').style.visibility =
+        currentPage > 0 ? 'visible' : 'hidden';
 
-	  // Mostra/nasconde il pulsante avanti
-	  document.getElementById('next-btn').style.visibility =
-		currentPage < totalPages - 1 ? 'visible' : 'hidden';
+      document.getElementById('next-btn').style.visibility =
+        currentPage < totalPages - 1 ? 'visible' : 'hidden';
 
-	  // Aggiorna indicatore pagina (se vuoi tenerlo)
-	  document.getElementById('page-indicator').textContent =
-		`Pagina ${currentPage + 1} di ${totalPages}`;
-	}
-	
-	document.getElementById('prev-btn').addEventListener('click', () => {
-	  currentPage--;
-	  renderPage(currentPage);
-	});
+      // Aggiorna il nuovo indicatore in header
+      document.getElementById('page-info').textContent =
+        `Pagina ${currentPage + 1} di ${totalPages}`;
+    }
+    
+    document.getElementById('prev-btn').addEventListener('click', () => {
+      currentPage--;
+      renderPage(currentPage);
+    });
 
-	document.getElementById('next-btn').addEventListener('click', () => {
-	  currentPage++;
-	  renderPage(currentPage);
-	});
+    document.getElementById('next-btn').addEventListener('click', () => {
+      currentPage++;
+      renderPage(currentPage);
+    });
 
-    // Caricamento catalogo precaricato
     const preloadKey = 'catalog_preload';
     const stored = sessionStorage.getItem(preloadKey);
-
     const savedCatalog = sessionStorage.getItem(`catalog_${mode}`);
 
     if (savedCatalog) {
       try {
         catalog = JSON.parse(savedCatalog);
-        console.log(`Catalogo già salvato: ${catalog.length} carte`);
         renderPage(currentPage);
       } catch (e) {
-        console.error('Errore nel parsing del catalogo salvato:', e);
         document.getElementById('grid').textContent = 'Errore nel caricamento delle carte.';
       }
     } else if (stored) {
@@ -154,17 +149,14 @@
         if (Array.isArray(parsed) && parsed.length > 0) {
           catalog = shuffle(parsed);
           sessionStorage.setItem(`catalog_${mode}`, JSON.stringify(catalog));
-          console.log(`Catalogo mescolato e salvato: ${catalog.length} carte`);
           renderPage(currentPage);
         } else {
           throw new Error('Catalogo vuoto o non valido');
         }
       } catch (e) {
-        console.error('Errore nel parsing del catalogo:', e);
         document.getElementById('grid').textContent = 'Errore nel caricamento delle carte.';
       }
     } else {
-      console.warn('Catalogo non trovato in sessionStorage.');
       document.getElementById('grid').textContent = 'Nessun catalogo disponibile. Torna alla home.';
     }
   </script>
