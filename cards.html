@@ -66,32 +66,16 @@
         cell.className = 'grid-item';
 
         if (mode === 'covered') {
-          const inner = document.createElement('div');
-          inner.className = 'flip-inner';
-
-          const back = document.createElement('img');
-          back.src = 'cards/retro.jpg';
-          back.alt = 'Retro';
-          back.className = 'flip-back';
-          back.loading = 'lazy';
-
-          const front = document.createElement('img');
-          front.src = `cards/carta${i}${ext}`;
-          front.alt = `Carta ${i}`;
-          front.className = 'flip-front';
-          front.loading = 'lazy';
-
-          inner.appendChild(back);
-          inner.appendChild(front);
-          cell.appendChild(inner);
-
-          cell.addEventListener('click', () => {
-            inner.classList.add('flipped');
-            inner.addEventListener('transitionend', () => {
-              location.href = `card.html?card=${i}&ext=${ext}`;
-            }, { once: true });
-          });
-        } else {
+		  const img = document.createElement('img');
+		  img.src = 'cards/retro.jpg';
+		  img.alt = 'Retro';
+		  img.className = 'flip-back';
+		  img.loading = 'lazy';
+		  img.addEventListener('click', () => {
+			location.href = `card.html?card=${i}&ext=${ext}`;
+		  });
+		  cell.appendChild(img);
+		} else {
           const img = document.createElement('img');
           img.src = `cards/carta${i}${ext}`;
           img.alt = `Carta ${i}`;
