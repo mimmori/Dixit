@@ -65,16 +65,15 @@
             misses = 0;
             i++;
             continue;
-          }
-
-          const png = await imageExists(`cards/carta${i}.png`);
-          if (png) {
-            found.push({ i, ext: '.png' });
-            misses = 0;
-            i++;
-            continue;
-          }
-
+          }else{
+			const png = await imageExists(`cards/carta${i}.png`);
+			if (png) {
+			  found.push({ i, ext: '.png' });
+			  misses = 0;
+			  i++;
+			  continue;
+			}
+		  }
           misses++;
           i++;
         }
