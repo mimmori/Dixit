@@ -6,20 +6,23 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  
   <header>
     <button id="back-btn">← Indietro</button>
-    <button id="exit-btn">Esci</button>
+    <div class="header-center">
+      <span id="mode-title"></span>
+      <span id="page-info"></span>
+    </div>
     <div class="toggle-container">
       <button id="theme-toggle">🌙</button>
     </div>
-    <span id="page-info"></span> <!-- nuovo indicatore pagina -->
+    <button id="exit-btn">Esci</button>
   </header>
 
   <!-- RIMOSSO: <div id="page-indicator" class="centered"></div> -->
   <div id="grid" class="grid-container fade-in"></div>
   <div id="pagination">
     <button id="prev-btn" class="nav-button">⬅</button>
-    <span id="mode-title"></span>
     <button id="next-btn" class="nav-button">➡</button>
   </div>
   
@@ -107,20 +110,19 @@
 
       requestAnimationFrame(() => grid.classList.add('fade-in'));
     }
-
+	
     function updatePaginationControls() {
       const totalPages = Math.ceil(catalog.length / CARDS_PER_PAGE);
-
+    
       document.getElementById('prev-btn').style.visibility =
         currentPage > 0 ? 'visible' : 'hidden';
-
+    
       document.getElementById('next-btn').style.visibility =
         currentPage < totalPages - 1 ? 'visible' : 'hidden';
-
-      // Aggiorna il nuovo indicatore in header
+    
       document.getElementById('page-info').textContent =
         `Pagina ${currentPage + 1} di ${totalPages}`;
-    }
+    }	
     
     document.getElementById('prev-btn').addEventListener('click', () => {
       currentPage--;

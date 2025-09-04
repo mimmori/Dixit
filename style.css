@@ -231,3 +231,25 @@ header #page-info {
 body.dark header #page-info {
   color: var(--text-color);
 }
+
+/* Contenitore centrale nell'header */
+.header-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px; /* spazio tra titolo e numero pagina */
+}
+
+/* Titolo modalità */
+.header-center #mode-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* Numero pagina */
+.header-center #page-info {
+  font-size: 0.85rem;
+  font-weight: 500;
+  opacity: 0.85;
+}
