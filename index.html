@@ -92,9 +92,6 @@
             const jpg = await imageExists(`cards/carta${i}.jpg`);
             if (jpg) return { i, ext: '.jpg' };
       
-            const png = await imageExists(`cards/carta${i}.png`);
-            if (png) return { i, ext: '.png' };
-      
             return null;
           })();
         });
