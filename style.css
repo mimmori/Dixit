@@ -1,8 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
 :root {
-  --base-font-size: 16px;
-  --font-scale: 1.25;
+  --base-font-size: 17px;
+  --font-scale: 1.333;
   --bg-color: #ffffff;
   --text-color: #222222;
   --header-bg: #f5f5f5;
@@ -44,8 +44,8 @@ html {
 
 body {
   font-family: 'Poppins', Arial, sans-serif;
-  font-size: 1.25rem;
-  line-height: 1.6;
+  font-size: 1.333rem;
+  line-height: 1.7;
   background-color: var(--bg-color);
   color: var(--text-color);
 }
@@ -70,7 +70,7 @@ header:hover { opacity: 1; }
 header button {
   background: none;
   border: none;
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   cursor: pointer;
   margin: 0 3px;
   padding: 2px 6px;
@@ -79,7 +79,7 @@ header button {
 .toggle-container button {
   background: none;
   border: none;
-  font-size: 1.25rem;
+  font-size: 1.333rem;
   cursor: pointer;
 }
 
@@ -115,7 +115,7 @@ h3 {
 }
 
 p {
-  font-size: 1.25rem;
+  font-size: 1.333rem;
   margin-bottom: 1em;
 }
 
@@ -129,7 +129,7 @@ p {
   border-radius: var(--button-radius);
   padding: 0.6em 1.2em;
   margin: 0.4em;
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
 }
@@ -215,7 +215,7 @@ p {
 
 #pagination #mode-title {
   pointer-events: none;
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   font-weight: 600;
 }
 
@@ -245,7 +245,7 @@ body.dark .grid-item:hover .flip-inner img {
   background-color: rgba(255, 255, 255, 0.8);
   z-index: 9999;
   font-family: sans-serif;
-  font-size: 1.25rem;
+  font-size: 1.333rem;
   color: #333;
 }
 
@@ -266,7 +266,7 @@ body.dark .grid-item:hover .flip-inner img {
 /* Indicatore pagina in header */
 header #page-info {
   margin-left: auto;
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   font-weight: 600;
   padding: 0 8px;
   color: var(--text-color);
@@ -288,13 +288,13 @@ body.dark header #page-info {
 
 /* Titolo modalità */
 .header-center #mode-title {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   font-weight: 600;
 }
 
 /* Numero pagina */
 .header-center #page-info {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   font-weight: 500;
   opacity: 0.85;
 }
