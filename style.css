@@ -1,6 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
 :root {
+  --base-font-size: 16px;
+  --font-scale: 1.25;
   --bg-color: #ffffff;
   --text-color: #222222;
   --header-bg: #f5f5f5;
@@ -17,20 +19,38 @@ body.dark {
   --primary-dark: #388E3C;
 }
 
+html {
+  font-size: var(--base-font-size);
+}
+
+@media (max-width: 600px) {
+  html {
+    font-size: 15px;
+    --font-scale: 1.125;
+  }
+}
+
+@media (min-width: 1200px) {
+  html {
+    font-size: 18px;
+  }
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-html, body {
-  height: 100%;
+body {
   font-family: 'Poppins', Arial, sans-serif;
+  font-size: 1.25rem;
+  line-height: 1.6;
   background-color: var(--bg-color);
   color: var(--text-color);
 }
 
-/* HEADER più sottile */
+/* HEADER */
 header {
   height: 40px;
   display: flex;
@@ -50,7 +70,7 @@ header:hover { opacity: 1; }
 header button {
   background: none;
   border: none;
-  font-size: 0.9rem;
+  font-size: 1.125rem;
   cursor: pointer;
   margin: 0 3px;
   padding: 2px 6px;
@@ -59,7 +79,7 @@ header button {
 .toggle-container button {
   background: none;
   border: none;
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   cursor: pointer;
 }
 
@@ -74,6 +94,31 @@ header button {
   margin: 10px 0;
 }
 
+/* TIPOGRAFIA */
+h1 {
+  font-size: calc(1rem * var(--font-scale) * var(--font-scale) * var(--font-scale));
+  font-weight: 600;
+  margin-bottom: 0.5em;
+  letter-spacing: 0.5px;
+}
+
+h2 {
+  font-size: calc(1rem * var(--font-scale) * var(--font-scale));
+  font-weight: 600;
+  margin-bottom: 0.5em;
+}
+
+h3 {
+  font-size: calc(1rem * var(--font-scale));
+  font-weight: 600;
+  margin-bottom: 0.5em;
+}
+
+p {
+  font-size: 1.25rem;
+  margin-bottom: 1em;
+}
+
 /* BOTTONI */
 .button-group button,
 .nav-button,
@@ -84,7 +129,7 @@ header button {
   border-radius: var(--button-radius);
   padding: 0.6em 1.2em;
   margin: 0.4em;
-  font-size: 0.9rem;
+  font-size: 1.125rem;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
 }
@@ -149,16 +194,16 @@ header button {
   border-radius: 8px;
 }
 
+/* PAGINAZIONE */
 #pagination {
-  position: sticky;   /* o fixed se vuoi che resti sempre visibile */
-  top: 40px;          /* altezza dell’header */
+  position: sticky;
+  top: 40px;
   left: 0;
   right: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 4px 10px;
-  /*background: rgba(255,255,255,0.85);*/
   box-shadow: 0 1px 3px rgba(0,0,0,0.08);
   pointer-events: none;
   z-index: 5;
@@ -170,7 +215,7 @@ header button {
 
 #pagination #mode-title {
   pointer-events: none;
-  font-size: 0.9rem;
+  font-size: 1.125rem;
   font-weight: 600;
 }
 
@@ -200,7 +245,7 @@ body.dark .grid-item:hover .flip-inner img {
   background-color: rgba(255, 255, 255, 0.8);
   z-index: 9999;
   font-family: sans-serif;
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   color: #333;
 }
 
@@ -220,8 +265,8 @@ body.dark .grid-item:hover .flip-inner img {
 
 /* Indicatore pagina in header */
 header #page-info {
-  margin-left: auto; /* lo spinge a destra */
-  font-size: 0.85rem;
+  margin-left: auto;
+  font-size: 1.125rem;
   font-weight: 600;
   padding: 0 8px;
   color: var(--text-color);
@@ -238,18 +283,18 @@ body.dark header #page-info {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 8px; /* spazio tra titolo e numero pagina */
+  gap: 8px;
 }
 
 /* Titolo modalità */
 .header-center #mode-title {
-  font-size: 0.9rem;
+  font-size: 1.125rem;
   font-weight: 600;
 }
 
 /* Numero pagina */
 .header-center #page-info {
-  font-size: 0.85rem;
+  font-size: 1.125rem;
   font-weight: 500;
   opacity: 0.85;
 }
