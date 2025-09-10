@@ -5,6 +5,7 @@
   <title>Scelta della modalità di lavoro</title>
   <link rel="stylesheet" href="style.css">
   <link rel="preload" href="cards/retro.jpg" as="image">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
   <header>
@@ -22,7 +23,7 @@
   </main>
 
   <!-- Loader visivo -->
-  <div id="loader" class="loader-container">
+  <div id="loader" class="loader-container" style="display:none;">
     <div class="loader"></div>
     <p id="loader-text">Caricamento carte in corso...</p>
   </div>
@@ -31,97 +32,179 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const loader = document.getElementById('loader');
-	  loader.style.display = 'none';
       const loaderText = document.getElementById('loader-text');
       const coveredBtn = document.getElementById('covered');
       const exposedBtn = document.getElementById('exposed');
 
-      async function imageExists(src) {
+      // Utilità: timeout per qualsiasi promessa
+      function withTimeout(promise, ms, onAbort) {
+        const controller = new AbortController();
+        const t = setTimeout(() => {
+          controller.abort();
+          if (onAbort) onAbort();
+        }, ms);
+        return Promise.race([
+          promise(controller.signal).finally(() => clearTimeout(t)),
+          new Promise((_, rej) => {
+            const e = new Error('timeout');
+            e.name = 'TimeoutError';
+            setTimeout(() => rej(e), ms + 1);
+          })
+        ]);
+      }
+
+      function isSameOrigin(url) {
+        try {
+          const u = new URL(url, location.href);
+          return u.origin === location.origin;
+        } catch {
+          return false;
+        }
+      }
+
+      // 1) Prova HEAD (solo se same-origin e il server lo supporta)
+      async function tryHead(url, signal) {
+        if (!isSameOrigin(url)) return false; // per evitare risposta "opaque"
+        const res = await fetch(url, { method: 'HEAD', signal });
+        return res.ok;
+      }
+
+      // 2) Prova GET con Range per scaricare 1 byte
+      async function tryRange(url, signal) {
+        const res = await fetch(url, {
+          method: 'GET',
+          headers: { 'Range': 'bytes=0-0' },
+          signal,
+        });
+        // Alcuni server rispondono 206 (parziale), altri 200; entrambi vanno bene
+        return res.ok && (res.status === 206 || res.status === 200);
+      }
+
+      // 3) Fallback: oggetto Image (scarica l’immagine, quindi usiamolo solo se necessario)
+      function tryImage(url) {
         return new Promise(resolve => {
           const img = new Image();
           img.onload = () => resolve(true);
           img.onerror = () => resolve(false);
-          img.src = src;
+          // Evita interferenze di cache per test ripetuti
+          const bust = (url.includes('?') ? '&' : '?');
+          img.src = url + bust;
         });
       }
 
-      async function detectCatalog(maxIndex = 500, missLimit = 10, timeout = 100000) {
-        const found = [];
-        let misses = 0;
-        let i = 1;
+      // Verifica "smart": HEAD -> Range -> Image
+      async function imageExistsSmart(url, perRequestTimeout = 4000) {
+        // HEAD (rapido, se consentito)
+        try {
+          const okHead = await withTimeout(
+            (signal) => tryHead(url, signal),
+            perRequestTimeout
+          );
+          if (okHead) return true;
+        } catch (_) {}
+
+        // GET Range (1 byte)
+        try {
+          const okRange = await withTimeout(
+            (signal) => tryRange(url, signal),
+            perRequestTimeout
+          );
+          if (okRange) return true;
+        } catch (_) {}
+
+        // Fallback Image
+        return await tryImage(url);
+      }
+
+      // Pool di richieste per non saturare la rete
+      async function detectCatalogWithPool(options = {}) {
+        const {
+          maxIndex = 500,
+          poolSize = 24,
+          timeout = 100000,
+          perRequestTimeout = 4000,
+          exts = ['.jpg', '.png'],
+        } = options;
+
         const startTime = Date.now();
+        const found = [];
+        let current = 1;
 
-        while (i <= maxIndex && misses < missLimit) {
-          if (Date.now() - startTime > timeout) {
-            console.warn('Timeout raggiunto durante il rilevamento del catalogo');
-            break;
-          }
-
-          loaderText.textContent = `Verifica carta ${i}...`;
-
-          const jpg = await imageExists(`cards/carta${i}.jpg`);
-          if (jpg) {
-            found.push({ i, ext: '.jpg' });
-            misses = 0;
-            i++;
-            continue;
-          }else{
-			const png = await imageExists(`cards/carta${i}.png`);
-			if (png) {
-			  found.push({ i, ext: '.png' });
-			  misses = 0;
-			  i++;
-			  continue;
-			}
-		  }
-          misses++;
-          i++;
+        async function nextIndex() {
+          const i = current;
+          current += 1;
+          return i;
         }
 
+        async function worker() {
+          while (true) {
+            if (Date.now() - startTime > timeout) return;
+
+            const i = await nextIndex();
+            if (i > maxIndex) return;
+
+            // Aggiorna UI (leggera)
+            if (i % 10 === 0) {
+              loaderText.textContent = `Verifica carta ${i}...`;
+            }
+
+            // Prova le estensioni in ordine
+            let detected = null;
+            for (const ext of exts) {
+              const url = `cards/carta${i}${ext}`;
+              const exists = await imageExistsSmart(url, perRequestTimeout);
+              if (exists) {
+                detected = { i, ext };
+                break;
+              }
+            }
+            if (detected) found.push(detected);
+          }
+        }
+
+        const workers = Array.from({ length: poolSize }, () => worker());
+        await Promise.all(workers);
+        // Ordina il risultato per indice
+        found.sort((a, b) => a.i - b.i);
         return found;
       }
-	  
-      async function detectCatalogParallel(maxIndex = 500, timeout = 100000) {
-        const startTime = Date.now();
-      
-        const tasks = Array.from({ length: maxIndex }, (_, idx) => {
-          const i = idx + 1;
-          return (async () => {
-            if (Date.now() - startTime > timeout) return null;
-      
-            const jpg = await imageExists(`cards/carta${i}.jpg`);
-            if (jpg) return { i, ext: '.jpg' };
-      
-            return null;
-          })();
-        });
-      
-        const results = await Promise.allSettled(tasks);
-        return results
-          .map(r => r.status === 'fulfilled' ? r.value : null)
-          .filter(Boolean);
-      }
-	  
-	  
+
       async function startWithMode(mode) {
         location.href = `cards.html?mode=${mode}`;
       }
 
-      async function loadcatalog() {
+      async function loadCatalog() {
         loader.style.display = 'flex';
         sessionStorage.clear();
-        const catalog = await detectCatalogParallel();
-        if (catalog.length === 0) {
+
+        try {
+          const catalog = await detectCatalogWithPool({
+            maxIndex: 500,
+            poolSize: 24,
+            timeout: 100000,
+            perRequestTimeout: 4000,
+            exts: ['.jpg', '.png'],
+          });
+
+          if (!catalog || catalog.length === 0) {
+            loader.style.display = 'none';
+            alert('Nessuna carta trovata. Verifica la cartella "cards/".');
+            return;
+          }
+
+          sessionStorage.setItem('catalog_preload', JSON.stringify(catalog));
+          console.log(`Catalogo precaricato: ${catalog.length} carte trovate`);
+        } catch (err) {
+          console.error('Errore durante il caricamento catalogo:', err);
+          alert('Errore nel precaricamento delle carte.');
+        } finally {
           loader.style.display = 'none';
-          alert('Nessuna carta trovata. Verifica la cartella "cards/"');
-          return;
         }
-        sessionStorage.setItem('catalog_preload', JSON.stringify(catalog));
-        console.log(`Catalogo precaricato: ${catalog.length} carte trovate`);
-        loader.style.display = 'none';
       }
 
-	  loadcatalog();
+      // Avvio caricamento catalogo
+      loadCatalog();
+
       coveredBtn.addEventListener('click', () => startWithMode('covered'));
       exposedBtn.addEventListener('click', () => startWithMode('exposed'));
     });
