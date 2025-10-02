@@ -32,19 +32,34 @@
     const img = document.getElementById('fullcard');
 
     if (Number.isInteger(idx) && idx > 0) {
-      if (ext) {
-        // Se l'estensione è passata, usala direttamente
-        img.src = `cards/carta${idx}${ext}`;
-        img.alt = `Carta ${idx}`;
-      } else {
-        // Se non c'è estensione, prova prima .jpg poi .png
-        img.src = `cards/carta${idx}.jpg`;
-        img.alt = `Carta ${idx}`;
-        img.onerror = () => {
-          img.onerror = null; // evita loop infinito
-          img.src = `cards/carta${idx}.png`;
-        };
-      }
+      fetch(`cards/carta${idx}HD${ext}`)
+        .then(response => {
+          if (response.ok) {
+            img.src = `cards/carta${idx}HD${ext}`;
+            img.alt = `Carta ${idx} (HD)`;
+          } else {
+            img.src = `cards/carta${idx}${ext}`;
+            img.alt = `Carta ${idx} (LD)`;
+          }
+        })
+      .catch(error => {
+      img.alt = "Carta non trovata!";
+      });
+	
+      //if (ext) {
+      //  // Se l'estensione è passata, usala direttamente
+      //  img.src = `cards/carta${idx}HD${ext}`;
+      //  img.alt = `Carta HD ${idx}`;
+      //} else {
+      //  // Se non c'è la versione HD carica quella base
+      //  //img.src = `cards/carta${idx}.jpg`;
+      //  img.src = `cards/carta${idx}${ext}`;
+      //  img.alt = `Carta LD ${idx}`;
+      //  img.onerror = () => {
+      //    img.onerror = null; // evita loop infinito
+      //    img.src = `cards/carta${idx}.png`;
+      //  };
+      //}
     } else {
       img.alt = "Carta non specificata";
     }
