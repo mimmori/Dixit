@@ -15,6 +15,7 @@
   </header>
 
   <main class="centered">
+    <p id="card-number" class="card-label"></p>
     <img id="fullcard" class="fullscreen-img" alt="Carta">
   </main>
 
@@ -30,6 +31,7 @@
     let ext = params.get('ext');
 
     const img = document.getElementById('fullcard');
+    const label = document.getElementById('card-number');
 
     if (Number.isInteger(idx) && idx > 0) {
       fetch(`cards/carta${idx}HD${ext}`)
@@ -41,27 +43,15 @@
             img.src = `cards/carta${idx}${ext}`;
             img.alt = `Carta ${idx} (LD)`;
           }
+          label.textContent = `Carta numero ${idx}`;
         })
-      .catch(error => {
-      img.alt = "Carta non trovata!";
-      });
-	
-      //if (ext) {
-      //  // Se l'estensione è passata, usala direttamente
-      //  img.src = `cards/carta${idx}HD${ext}`;
-      //  img.alt = `Carta HD ${idx}`;
-      //} else {
-      //  // Se non c'è la versione HD carica quella base
-      //  //img.src = `cards/carta${idx}.jpg`;
-      //  img.src = `cards/carta${idx}${ext}`;
-      //  img.alt = `Carta LD ${idx}`;
-      //  img.onerror = () => {
-      //    img.onerror = null; // evita loop infinito
-      //    img.src = `cards/carta${idx}.png`;
-      //  };
-      //}
+        .catch(error => {
+          img.alt = "Carta non trovata!";
+          label.textContent = `Carta numero ${idx}`;
+        });
     } else {
       img.alt = "Carta non specificata";
+      label.textContent = "Carta non specificata";
     }
   </script>
 </body>
